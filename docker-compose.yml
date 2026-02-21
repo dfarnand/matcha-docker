@@ -1,0 +1,14 @@
+services:
+  matcha:
+    build:
+      context: .
+      args:
+        MATCHA_VERSION: ${MATCHA_VERSION:-v0.9.0}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config:/app/config
+      - ./output:/app/output
+    environment:
+      - CRON_SCHEDULE=${CRON_SCHEDULE:-0 6 * * *}
+    restart: unless-stopped
