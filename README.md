@@ -43,10 +43,10 @@ ONE IMPORTANT NOTE: the first line of the config file must be set to the right o
 markdown_dir_path: /app/output/
 ```
 
-A good test that everything is working will be to generate a full set of files going back in time as far as your feeds go. To do this, you'll need to open a shell into the docker container (unless you still have it open from before)
+Now you can run matcha (still in the container's shell from before). This is mostly a test to make sure everything is working - from here it should run automatically on the cron schedule specified in the compose.
 
 ```sh
-matcha -c /app/config/config.yaml --generate-all
+matcha -c /app/config/config.yaml
 ```
 
 ## Notes

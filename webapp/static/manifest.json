@@ -1,0 +1,23 @@
+{
+  "name": "Matcha Digest",
+  "short_name": "Matcha",
+  "description": "Daily news digest from RSS feeds",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a170f",
+  "theme_color": "#eec35e",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -20,8 +20,11 @@ var indexTemplate = template.Must(template.New("index").Parse(`<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a170f">
+    <meta name="description" content="Daily news digest from RSS feeds">
     <title>Matcha Digest</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍵</text></svg>">
+    <link rel="manifest" href="/static/manifest.json">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -38,6 +41,13 @@ var indexTemplate = template.Must(template.New("index").Parse(`<!DOCTYPE html>
     <main class="content">
         {{.Content}}
     </main>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js').catch(function(err) {
+                console.log('SW registration failed:', err);
+            });
+        }
+    </script>
 </body>
 </html>
 `))
