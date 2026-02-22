@@ -162,6 +162,6 @@ func main() {
 		renderPage(w, "")
 	})
 
-	log.Println("Server starting on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Server starting on :7321")
+	log.Fatal(http.ListenAndServe(":7321", nil))
 }

@@ -9,10 +9,45 @@ The web app has a similar goal as [go-digest](https://github.com/piqoni/go-diges
 Docker compose:
 
 ```
+services:
 
+  matcha:
+    container_name: matcha
+    image: ghcr.io/dfarnand/matcha-docker:latest
+    ports:
+      - 7321:7321
+    volumes:
+      - ${DOCKER_CONFIG_DIR}/matcha:/app/config
+      - ${BACKEND_DOC_DIR}/matcha:/app/output
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - CRON_SCHEDULE="0 6 * * *" # Customize to your needs
+    restart: unless-stopped
 ```
 
+You'll need a config file in whatever config directory you set up. Matcha will create it the first time it runs, though not necessarily in the right location. To set this up, once the container is running use these commands
 
+```sh
+docker exec -it matcha /bin/sh
+
+# Now inside the container shell
+matcha
+cp config.yaml /app/config/
+```
+
+Then you can edit the config file. Refer back to the original [matcha](https://github.com/piqoni/matcha) repo for information on configuration. 
+
+ONE IMPORTANT NOTE: the first line of the config file must be set to the right output folder, or you won't see any markdown files in the webapp!
+
+```
+markdown_dir_path: /app/output/
+```
+
+A good test that everything is working will be to generate a full set of files going back in time as far as your feeds go. To do this, you'll need to open a shell into the docker container (unless you still have it open from before)
+
+```sh
+matcha -c /app/config/config.yaml --generate-all
+```
 
 ## Notes
 
