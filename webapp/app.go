@@ -42,6 +42,10 @@ var indexTemplate = template.Must(template.New("index").Parse(`<!DOCTYPE html>
         {{.Content}}
     </main>
     <script>
+        document.querySelectorAll('.content a').forEach(function(link) {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener');
+        });
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/sw.js').catch(function(err) {
                 console.log('SW registration failed:', err);
