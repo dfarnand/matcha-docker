@@ -37,10 +37,11 @@ cp config.yaml /app/config/
 
 Then you can edit the config file. Refer back to the original [matcha](https://github.com/piqoni/matcha) repo for information on configuration. 
 
-ONE IMPORTANT NOTE: the first line of the config file must be set to the right output folder, or you won't see any markdown files in the webapp!
+You can configure it however you like, except you MUST set the following two settings:
 
 ```
 markdown_dir_path: /app/output/
+database_file_path: /app/config/matcha.db
 ```
 
 Now you can run matcha (still in the container's shell from before). This is mostly a test to make sure everything is working - from here it should run automatically on the cron schedule specified in the compose.
