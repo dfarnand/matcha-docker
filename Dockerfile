@@ -33,6 +33,6 @@ COPY webapp/static /app/webapp/static
 COPY webapp/entrypoint.sh /app/webapp/entrypoint.sh
 RUN chmod +x /app/webapp/entrypoint.sh
 
-EXPOSE 8080
+EXPOSE 7321
 
 ENTRYPOINT ["/app/webapp/entrypoint.sh"]

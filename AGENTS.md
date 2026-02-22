@@ -60,7 +60,7 @@ Single container with cron-scheduled Matcha runs + Go webapp for viewing markdow
 docker-compose up --build
 ```
 
-Access at `http://localhost:8080`
+Access at `http://localhost:7321`
 
 ## Dependencies
 

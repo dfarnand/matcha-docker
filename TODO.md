@@ -1,6 +1,0 @@
-- Test to make sure Matcha can run as expected
-- Links should be on separate lines
-- Favicons (in feed titles) probably need to be smaller
-- The favicon for the page should be a cup of matcha
-- Green on black is too harsh. terminal.xyz has better colors than that.
-- Adapt repo to build docker container on github (compose will just be an example of how to run it at home with precompiled image)

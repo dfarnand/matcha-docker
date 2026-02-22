@@ -21,6 +21,7 @@ var indexTemplate = template.Must(template.New("index").Parse(`<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matcha Digest</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍵</text></svg>">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -162,6 +163,6 @@ func main() {
 		renderPage(w, "")
 	})
 
-	log.Println("Server starting on :7321")
-	log.Fatal(http.ListenAndServe(":7321", nil))
+	log.Println("Server starting on :8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

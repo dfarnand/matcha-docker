@@ -5,7 +5,7 @@ services:
       args:
         MATCHA_VERSION: ${MATCHA_VERSION:-v0.9.0}
     ports:
-      - "7321:7321"
+      - 7321:7321
     volumes:
       - ./config:/app/config
       - ./output:/app/output

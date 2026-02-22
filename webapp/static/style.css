@@ -1,10 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+
 :root {
-    --bg: #1a1a1a;
-    --sidebar-bg: #252525;
-    --text: #e0e0e0;
-    --accent: #4af626;
-    --border: #333;
-    --hover: #333;
+    --bg: #1a170f;
+    --text: #eceae5;
+    --accent: #eec35e;
+    --sidebar-bg: #252117;
+    --border: #3d382c;
+    --hover: #3d382c;
+    --code-bg: rgba(236, 234, 229, 0.05);
 }
 
 * {
@@ -14,13 +17,15 @@
 }
 
 body {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: "Fira Code", "JetBrains Mono", Monaco, Consolas, "Ubuntu Mono", monospace;
+    font-size: 1rem;
+    line-height: 1.54em;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.6;
     min-height: 100vh;
 }
 
+/* Sidebar - custom layout */
 .menu-toggle {
     display: none;
 }
@@ -86,71 +91,169 @@ body {
     color: var(--bg);
 }
 
+/* Main content */
 .content {
     margin-left: 220px;
     padding: 30px 40px;
     max-width: 800px;
 }
 
-.content h1, .content h2, .content h3 {
+/* Headings */
+.content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
     color: var(--accent);
-    margin: 20px 0 10px;
+    margin: 25px 0;
+    font-weight: 600;
 }
 
 .content h1 {
-    font-size: 24px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
+    font-size: 1.45rem;
+}
+
+.content h2 {
+    font-size: 1.35rem;
+}
+
+.content h3 {
+    font-size: 1.15rem;
 }
 
 .content p {
-    margin-bottom: 15px;
+    margin: 25px 0;
 }
 
+/* Links */
 .content a {
     color: var(--accent);
 }
 
 .content ul, .content ol {
-    margin: 10px 0 15px 25px;
+    margin: 25px 0;
+    margin-left: 4ch;
+    padding: 0;
 }
 
 .content li {
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    display: block;
+    position: relative;
 }
 
-.content pre {
-    background: var(--sidebar-bg);
-    padding: 15px;
-    overflow-x: auto;
-    border: 1px solid var(--border);
-    margin: 15px 0;
+.content li::marker {
+    color: var(--accent);
+}
+
+.content li a {
+    display: block;
+    margin: 4px 0;
+}
+
+.content p a {
+    display: block;
+    margin: 4px 0;
+    padding: 6px 10px;
+    background: var(--code-bg);
+    border-radius: 4px;
+}
+
+/* Favicon sizing - critical for feed icons */
+.content img {
+    max-width: 16px !important;
+    max-height: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    vertical-align: middle;
+}
+
+/* Code */
+.content code, .content kbd {
+    font-family: "Fira Code", "JetBrains Mono", Monaco, Consolas, "Ubuntu Mono", monospace !important;
+    background: var(--code-bg);
+    color: var(--accent);
+    padding: 0 6px;
+    margin: 0 2px;
+    font-size: 0.95em;
 }
 
 .content code {
-    font-family: 'Courier New', Courier, monospace;
-    background: var(--sidebar-bg);
-    padding: 2px 5px;
+    border: 1px solid rgba(236, 234, 229, 0.25);
 }
 
-.content blockquote {
-    border-left: 3px solid var(--accent);
-    padding-left: 15px;
-    margin: 15px 0;
-    color: #999;
+.content pre {
+    tab-size: 4;
+    background: var(--code-bg) !important;
+    color: var(--text);
+    padding: 20px 10px;
+    font-size: 0.95em !important;
+    overflow: auto;
+    border: 1px solid rgba(236, 234, 229, 0.25);
+    margin: 25px 0;
 }
 
-.content img {
-    max-width: 100%;
-    height: auto;
-}
-
-.content hr {
+.content pre code {
+    background: none !important;
+    padding: 0;
     border: none;
-    border-top: 1px solid var(--border);
-    margin: 20px 0;
 }
 
+/* Blockquotes - terminal.xyz style */
+.content blockquote {
+    position: relative;
+    border-top: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    margin: 0;
+    padding: 25px;
+}
+
+.content blockquote:before {
+    content: ">";
+    display: block;
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+}
+
+.content blockquote p:first-child {
+    margin-top: 0;
+}
+
+.content blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* Tables */
+.content table {
+    table-layout: auto;
+    border-collapse: collapse;
+    margin: 25px 0;
+}
+
+.content table, .content th, .content td {
+    border: 2px solid var(--text);
+    padding: 10px;
+}
+
+.content th {
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* HR */
+.content hr {
+    width: 100%;
+    border: none;
+    background: var(--accent);
+    height: 2px;
+    margin: 25px 0;
+}
+
+/* Mark */
+.content mark {
+    background: rgba(238, 195, 94, 0.45);
+    color: var(--text);
+}
+
+/* Mobile */
 @media (max-width: 600px) {
     .menu-btn {
         display: block;
