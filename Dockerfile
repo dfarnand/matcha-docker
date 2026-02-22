@@ -31,6 +31,7 @@ RUN mkdir -p /app/output /app/webapp/static
 COPY webapp/static /app/webapp/static
 
 COPY webapp/entrypoint.sh /app/webapp/entrypoint.sh
+COPY webapp/matcha-runner.sh /app/webapp/matcha-runner.sh
 RUN chmod +x /app/webapp/entrypoint.sh
 
 EXPOSE 7321
