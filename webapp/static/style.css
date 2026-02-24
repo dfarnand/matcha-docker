@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
 
 :root {
-    --bg: #1a170f;
-    --text: #eceae5;
-    --accent: #eec35e;
-    --sidebar-bg: #252117;
-    --border: #3d382c;
-    --hover: #3d382c;
-    --code-bg: rgba(236, 234, 229, 0.05);
+    --bg: #1d2021;
+    --text: #ebdbb2;
+    --accent: #8ec07c;
+    --sidebar-bg: #282a2e;
+    --border: #3c3f42;
+    --hover: #3c3f42;
+    --code-bg: rgba(235, 219, 178, 0.05);
 }
 
 * {
@@ -249,7 +249,7 @@ body {
 
 /* Mark */
 .content mark {
-    background: rgba(238, 195, 94, 0.45);
+    background: rgba(142, 192, 124, 0.45);
     color: var(--text);
 }
 

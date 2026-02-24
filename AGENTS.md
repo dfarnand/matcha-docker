@@ -50,7 +50,7 @@ Single container with cron-scheduled Matcha runs + Go webapp for viewing markdow
 ## Cron Configuration
 
 - Configured in `/etc/crontabs/root` at startup via `entrypoint.sh`
-- Runs: `/usr/local/bin/matcha -c /app/config/config.yaml`
+- Runs: `/usr/local/bin/matcha-runner`, which the docker build copies from matcha-runner.sh
 - Verify with: `docker exec <container> cat /etc/crontabs/root`
 - Cron daemon runs as: `crond -b -l 2`
 
