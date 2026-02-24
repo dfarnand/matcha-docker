@@ -21,7 +21,7 @@ services:
       - ${BACKEND_DOC_DIR}/matcha:/app/output
       - /etc/localtime:/etc/localtime:ro
     environment:
-      - CRON_SCHEDULE="0 6 * * *" # Customize to your needs
+      - CRON_SCHEDULE=0 6 * * * # Customize to your needs
     restart: unless-stopped
 ```
 
