@@ -1,0 +1,22 @@
+/* Gruvbox Dark Hard — https://github.com/morhetz/gruvbox */
+:root {
+    /* Backgrounds */
+    --grv-bg-hard:   #1d2021;
+    --grv-bg-soft:   #282a2e;
+    --grv-bg-dim:    #3c3f42;
+    --grv-bg-warm:   #504945;
+
+    /* Foregrounds */
+    --grv-fg1:       #ebdbb2;   /* primary text - warm cream */
+    --grv-fg2:       #d5c4a1;   /* secondary - slightly dimmer */
+    --grv-fg3:       #bdae93;   /* tertiary - for sidebar inactive */
+
+    /* Bright accent colors */
+    --grv-yellow:    #fabd2f;
+    --grv-orange:    #fe8019;
+    --grv-red:       #fb4934;
+    --grv-aqua:      #8ec07c;   /* existing --accent */
+    --grv-blue:      #83a598;
+    --grv-purple:    #d3869b;
+    --grv-green:     #b8bb26;
+}
