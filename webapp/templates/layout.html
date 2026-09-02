@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d2021">
+    <meta name="description" content="Daily news digest from RSS feeds">
+    <title>{{block "title" .}}Matcha Digest{{end}}</title>
+    <link rel="icon" href="/static/icons/icon-192.svg">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192.svg">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="stylesheet" href="/static/style.css">
+    {{block "head" .}}{{end}}
+</head>
+<body>
+    <!-- The hamburger toggle must stay immediately before .sidebar: the mobile
+         menu is a CSS sibling selector (.menu-toggle:checked ~ .sidebar). -->
+    <input type="checkbox" id="menu-toggle" class="menu-toggle">
+    <label for="menu-toggle" class="menu-btn">☰</label>
+    <nav class="sidebar">
+        {{block "sidebar" .}}{{end}}
+    </nav>
+    {{block "main" .}}{{end}}
+    {{block "scripts" .}}{{end}}
+</body>
+</html>

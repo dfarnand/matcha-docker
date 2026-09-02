@@ -1,0 +1,577 @@
+/*
+ * Settings UI.
+ *
+ * Loaded after style.css, which supplies the :root variables, body and
+ * sidebar. Everything here is namespaced `st-`.
+ *
+ * The settings page deliberately does NOT use `.content`: that class clamps
+ * every image to 16x16 !important and makes links display:block with a
+ * background chip, which is right for a rendered digest and wrong for a form.
+ */
+
+:root {
+    /* Semantic names for the palette colours style.css leaves unused. */
+    --danger:       var(--grv-red);
+    --success:      var(--grv-green);
+    --warn:         var(--grv-yellow);
+    --panel-accent: var(--grv-purple);
+    --field-bg:     rgba(235, 219, 178, 0.04);
+}
+
+/* ---------- layout ---------- */
+
+.st-page {
+    margin-left: 220px;
+    padding: 30px 40px 140px;
+    max-width: 900px;
+}
+
+.st-page-narrow {
+    max-width: 460px;
+}
+
+.st-header {
+    margin-bottom: 28px;
+}
+
+.st-header h1 {
+    color: var(--color-h1);
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+}
+
+.st-section {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.st-section > h2,
+.st-section > summary > h2 {
+    color: var(--color-h2);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+}
+
+.st-section > summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.st-section > summary > h2 {
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+.st-section > summary::before {
+    content: "▸ ";
+    color: var(--color-h2);
+}
+
+details[open].st-section > summary::before {
+    content: "▾ ";
+}
+
+details[open].st-section > summary {
+    margin-bottom: 14px;
+}
+
+/* ---------- fields ---------- */
+
+.st-field {
+    margin-bottom: 16px;
+}
+
+.st-field-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.st-field-row .st-field {
+    flex: 1 1 180px;
+}
+
+.st-label {
+    display: block;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+}
+
+.st-hint {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin-top: 6px;
+    font-style: normal;
+}
+
+.st-hint code {
+    color: var(--color-code);
+    background: var(--code-bg);
+    padding: 1px 4px;
+    border-radius: 2px;
+}
+
+.st-input {
+    width: 100%;
+    background: var(--field-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.st-input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.st-input:disabled {
+    color: var(--text-dim);
+    cursor: not-allowed;
+}
+
+.st-input-inline {
+    width: auto;
+    flex: 1 1 220px;
+}
+
+textarea.st-input {
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.st-input-invalid {
+    border-color: var(--danger);
+}
+
+.st-error {
+    color: var(--danger);
+    font-size: 0.8rem;
+    margin-top: 6px;
+}
+
+.st-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    cursor: pointer;
+}
+
+.st-checkbox input {
+    margin-top: 3px;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+}
+
+.st-checkbox em {
+    display: block;
+}
+
+.st-checkbox-inline {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 0;
+    font-size: 0.85rem;
+}
+
+/* ---------- buttons ---------- */
+
+.st-btn {
+    background: var(--sidebar-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.st-btn:hover:not(:disabled) {
+    background: var(--hover);
+}
+
+.st-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.st-btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+    font-weight: bold;
+}
+
+.st-btn-primary:hover:not(:disabled) {
+    background: var(--grv-fg2);
+    border-color: var(--grv-fg2);
+}
+
+.st-btn-danger {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.st-btn-danger:hover:not(:disabled) {
+    background: var(--danger);
+    color: var(--bg);
+}
+
+.st-btn-small {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+}
+
+.st-btn-icon {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--text-dim);
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.st-btn-icon:hover:not(:disabled) {
+    background: var(--hover);
+    color: var(--text);
+}
+
+.st-btn-icon:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
+.st-linkbtn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 8px 10px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.st-linkbtn:hover {
+    color: var(--danger);
+}
+
+.st-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.st-presets {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+/* ---------- feed rows ---------- */
+
+.st-feed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Flex rather than a fixed grid: summary and analyst rows have no item-limit
+   box, and on narrow screens the controls wrap under the URL on their own. */
+.st-feed-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.st-feed-url {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+.st-feed-limit {
+    flex: 0 0 76px;
+    width: 76px;
+}
+
+.st-feed-row.st-feed-disabled .st-feed-url {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+.st-feed-url,
+.st-feed-limit {
+    margin: 0;
+}
+
+.st-feed-error {
+    grid-column: 1 / -1;
+    color: var(--danger);
+    font-size: 0.8rem;
+}
+
+.st-empty {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    font-style: italic;
+    padding: 6px 0;
+}
+
+/* ---------- keyword chips ---------- */
+
+.st-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.st-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px 6px 4px 12px;
+    font-size: 0.85rem;
+}
+
+/* ---------- banners, status, toasts ---------- */
+
+.st-banner {
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    border-radius: 3px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+}
+
+.st-banner p {
+    margin: 8px 0;
+    font-size: 0.88rem;
+}
+
+.st-banner ul {
+    margin: 10px 0 10px 20px;
+    font-size: 0.85rem;
+}
+
+.st-banner li {
+    margin-bottom: 5px;
+}
+
+.st-banner code {
+    color: var(--color-code);
+    background: var(--code-bg);
+    padding: 1px 4px;
+}
+
+.st-banner-error {
+    border-left-color: var(--danger);
+}
+
+.st-banner-error strong {
+    color: var(--danger);
+}
+
+.st-banner-warn {
+    border-left-color: var(--warn);
+}
+
+.st-banner-warn strong {
+    color: var(--warn);
+}
+
+.st-status {
+    font-size: 0.9rem;
+    line-height: 1.7;
+}
+
+.st-status .st-ok {
+    color: var(--success);
+}
+
+.st-status .st-fail {
+    color: var(--danger);
+}
+
+.st-status .st-muted {
+    color: var(--text-dim);
+}
+
+.st-pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    white-space: pre;
+    overflow-x: auto;
+    max-height: 420px;
+}
+
+.st-toast-host {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 60;
+}
+
+.st-toast {
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    border-radius: 3px;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    max-width: 360px;
+}
+
+.st-toast-ok {
+    border-left-color: var(--success);
+}
+
+.st-toast-err {
+    border-left-color: var(--danger);
+}
+
+/* ---------- save bar ---------- */
+
+.st-savebar {
+    position: fixed;
+    bottom: 0;
+    left: 220px;
+    right: 0;
+    background: var(--sidebar-bg);
+    border-top: 1px solid var(--border);
+    padding: 12px 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 50;
+}
+
+.st-dirty {
+    color: var(--warn);
+    font-size: 0.85rem;
+}
+
+/* ---------- feed preview panel ---------- */
+
+.st-panel-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+}
+
+.st-panel-backdrop[hidden] {
+    display: none;
+}
+
+.st-panel {
+    background: var(--bg);
+    border: 1px solid var(--panel-accent);
+    border-radius: 4px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.st-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.st-panel-head h3 {
+    color: var(--panel-accent);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.st-panel-body {
+    padding: 16px;
+    overflow-y: auto;
+    font-size: 0.88rem;
+}
+
+.st-panel-body ol {
+    margin-left: 20px;
+    line-height: 1.6;
+}
+
+.st-panel-body li {
+    margin-bottom: 8px;
+}
+
+.st-panel-body a {
+    color: var(--color-link);
+}
+
+.st-preview-feedtitle {
+    color: var(--accent);
+    margin-bottom: 12px;
+    word-break: break-word;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 600px) {
+    .st-page {
+        margin-left: 0;
+        padding: 60px 20px 140px;
+    }
+
+    .st-savebar {
+        left: 0;
+        padding: 12px 20px;
+    }
+
+    .st-feed-url {
+        flex: 1 1 100%;
+    }
+
+    .st-toast-host {
+        left: 20px;
+        right: 20px;
+        bottom: 80px;
+    }
+
+    .st-toast {
+        max-width: none;
+    }
+}

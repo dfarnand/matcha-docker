@@ -1,7 +1,9 @@
 #!/bin/sh
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting Matcha..."
-/usr/local/bin/matcha -c /app/config/config.yaml
-exit_code=$?
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Matcha completed with exit code $exit_code"
-exit $exit_code
+# Manual run helper: docker exec <container> matcha-runner
+#
+# This goes through the webapp binary rather than calling matcha directly so
+# that config.yaml is regenerated from the current settings first, and so the
+# run is recorded in last-run.json like any other.
+
+exec /usr/local/bin/webapp -run -source manual-cli

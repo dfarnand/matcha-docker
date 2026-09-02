@@ -1,0 +1,33 @@
+{{define "title"}}Matcha Digest{{end}}
+
+{{define "sidebar"}}
+        <h2>Files</h2>
+        <ul class="file-list">
+            {{range .Files}}
+            <li><a href="/file/{{.Name}}" {{if .Active}}class="active"{{end}}>{{.Date}}</a></li>
+            {{end}}
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/settings">⚙ Settings</a>
+        </div>
+{{end}}
+
+{{define "main"}}
+    <main class="content">
+        {{.Content}}
+    </main>
+{{end}}
+
+{{define "scripts"}}
+    <script>
+        document.querySelectorAll('.content a').forEach(function(link) {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener');
+        });
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js').catch(function(err) {
+                console.log('SW registration failed:', err);
+            });
+        }
+    </script>
+{{end}}

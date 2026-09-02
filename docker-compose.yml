@@ -10,5 +10,16 @@ services:
       - ./config:/app/config
       - ./output:/app/output
     environment:
+      # Seeds the schedule on first start only. After that it is managed at
+      # /settings and this value is ignored.
       - CRON_SCHEDULE=${CRON_SCHEDULE:-0 6 * * *}
+      # The schedule runs in the container's local time. Set this (or mount
+      # /etc/localtime:/etc/localtime:ro) so "6am" means 6am where you are.
+      # - TZ=Europe/Copenhagen
+      # Set to 1 only when a TLS-terminating proxy in front of this container
+      # does not send X-Forwarded-Proto. Setting it without HTTPS breaks login.
+      # - MATCHA_COOKIE_SECURE=1
+      # Set to 1 to honour X-Forwarded-For for login rate limiting. Only do
+      # this behind a trusted proxy, or the limiter becomes bypassable.
+      # - TRUST_PROXY=1
     restart: unless-stopped

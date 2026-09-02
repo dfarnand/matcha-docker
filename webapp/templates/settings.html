@@ -1,0 +1,304 @@
+{{define "title"}}Settings · Matcha{{end}}
+
+{{define "head"}}
+    <link rel="stylesheet" href="/static/settings.css">
+    <meta name="csrf-token" content="{{.CSRFToken}}">
+{{end}}
+
+{{define "sidebar"}}
+        <h2>Matcha</h2>
+        <ul class="file-list">
+            <li><a href="/">← Back to digest</a></li>
+            <li><a href="/settings" class="active">⚙ Settings</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <form method="POST" action="/logout">
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                <button class="st-linkbtn" type="submit">Sign out</button>
+            </form>
+        </div>
+{{end}}
+
+{{define "main"}}
+    <!-- Deliberately .st-page and not .content: the digest stylesheet clamps
+         every image inside .content to 16x16 !important and makes links
+         display:block, which would wreck this form. -->
+    <main class="st-page">
+        <div class="st-header">
+            <h1>Settings</h1>
+            <p class="st-hint">
+                These settings generate matcha's <code>config.yaml</code> before every run.
+                Editing that file directly has no effect.
+            </p>
+        </div>
+
+        {{if .Degraded}}
+        <div class="st-banner st-banner-error">
+            <strong>Your settings file could not be read.</strong>
+            <p>{{.Degraded}}</p>
+            <p>The unreadable file was kept as <code>{{.DegradedBackup}}</code>. Defaults are
+               shown below, and saving is disabled until you choose to start fresh.</p>
+            <button class="st-btn st-btn-danger" type="button" id="discard-corrupt">
+                Discard the unreadable file and start fresh
+            </button>
+        </div>
+        {{end}}
+
+        <div id="migration-banner" class="st-banner st-banner-warn" hidden>
+            <strong>Notes from importing your previous config.yaml</strong>
+            <ul id="migration-list"></ul>
+            <button class="st-btn" type="button" id="dismiss-migration">Dismiss</button>
+        </div>
+
+        <!-- Status -->
+        <section class="st-section">
+            <h2>Status</h2>
+            <div class="st-status" id="run-status">Loading…</div>
+            <div class="st-actions">
+                <button class="st-btn st-btn-primary" type="button" id="run-now">Run now</button>
+                <button class="st-btn" type="button" id="toggle-output" hidden>Show last output</button>
+            </div>
+            <pre class="st-pre" id="run-output" hidden></pre>
+        </section>
+
+        <!-- Schedule -->
+        <section class="st-section">
+            <h2>Schedule</h2>
+            <div class="st-field">
+                <label class="st-label" for="schedule">Cron schedule</label>
+                <input class="st-input" type="text" id="schedule" spellcheck="false"
+                       placeholder="0 6 * * *">
+                <p class="st-hint" id="schedule-hint">
+                    Five fields: minute hour day-of-month month day-of-week.
+                </p>
+            </div>
+            <div class="st-presets" id="schedule-presets">
+                <button class="st-btn st-btn-small" type="button" data-cron="0 6 * * *">Daily 6am</button>
+                <button class="st-btn st-btn-small" type="button" data-cron="0 6,18 * * *">Twice daily</button>
+                <button class="st-btn st-btn-small" type="button" data-cron="0 * * * *">Hourly</button>
+                <button class="st-btn st-btn-small" type="button" data-cron="0 6 * * 1-5">Weekdays 6am</button>
+                <button class="st-btn st-btn-small" type="button" data-cron="*/30 * * * *">Every 30 min</button>
+            </div>
+        </section>
+
+        <!-- Feeds -->
+        <section class="st-section">
+            <h2>Feeds</h2>
+            <p class="st-hint">
+                The main digest. Leave the item limit empty to use matcha's default of 20.
+            </p>
+            <div class="st-feed-list" id="feeds-list" data-kind="feeds"></div>
+            <div class="st-actions">
+                <button class="st-btn" type="button" data-add-feed="feeds">+ Add feed</button>
+            </div>
+        </section>
+
+        <section class="st-section">
+            <h2>Summary feeds</h2>
+            <p class="st-hint">
+                Articles from these feeds are summarised by an LLM. Needs an OpenAI API key below.
+            </p>
+            <div class="st-feed-list" id="summary_feeds-list" data-kind="summary_feeds"></div>
+            <div class="st-actions">
+                <button class="st-btn" type="button" data-add-feed="summary_feeds">+ Add summary feed</button>
+            </div>
+        </section>
+
+        <section class="st-section">
+            <h2>Analyst feeds</h2>
+            <p class="st-hint">
+                Fed to the analyst prompt below. matcha always reads 20 items from these,
+                so there is no per-feed limit.
+            </p>
+            <div class="st-feed-list" id="analyst_feeds-list" data-kind="analyst_feeds"></div>
+            <div class="st-actions">
+                <button class="st-btn" type="button" data-add-feed="analyst_feeds">+ Add analyst feed</button>
+            </div>
+        </section>
+
+        <!-- Google News -->
+        <section class="st-section">
+            <h2>Google News keywords</h2>
+            <p class="st-hint">Each keyword becomes part of a Google News search feed.</p>
+            <div class="st-chips" id="keywords-list"></div>
+            <div class="st-actions">
+                <input class="st-input st-input-inline" type="text" id="keyword-input"
+                       placeholder="Add a keyword and press Enter">
+                <button class="st-btn" type="button" id="add-keyword">Add</button>
+            </div>
+        </section>
+
+        <!-- Digest content -->
+        <section class="st-section">
+            <h2>Digest content</h2>
+            <label class="st-checkbox"><input type="checkbox" id="reading_time">
+                <span>Show estimated reading time
+                    <em class="st-hint">Fetches every article in full; makes runs much slower.</em>
+                </span></label>
+            <label class="st-checkbox"><input type="checkbox" id="show_images">
+                <span>Include article images</span></label>
+            <label class="st-checkbox"><input type="checkbox" id="instapaper">
+                <span>Add Instapaper "read later" links</span></label>
+
+            <div class="st-field">
+                <label class="st-label" for="markdown_file_prefix">Filename prefix</label>
+                <input class="st-input" type="text" id="markdown_file_prefix">
+            </div>
+            <div class="st-field">
+                <label class="st-label" for="markdown_file_suffix">Filename suffix</label>
+                <input class="st-input" type="text" id="markdown_file_suffix">
+                <p class="st-hint">Digests are named by date, e.g. <code>2026-09-02.md</code>.</p>
+            </div>
+        </section>
+
+        <!-- Weather -->
+        <section class="st-section">
+            <h2>Weather</h2>
+            <div class="st-field-row">
+                <div class="st-field">
+                    <label class="st-label" for="weather_latitude">Latitude</label>
+                    <input class="st-input" type="number" step="any" id="weather_latitude">
+                </div>
+                <div class="st-field">
+                    <label class="st-label" for="weather_longitude">Longitude</label>
+                    <input class="st-input" type="number" step="any" id="weather_longitude">
+                </div>
+            </div>
+            <label class="st-checkbox"><input type="checkbox" id="sunrise_sunset">
+                <span>Show sunrise and sunset
+                    <em class="st-hint">Needs both latitude and longitude to be non-zero.</em>
+                </span></label>
+        </section>
+
+        <!-- AI -->
+        <section class="st-section">
+            <h2>AI</h2>
+            <div class="st-field">
+                <label class="st-label" for="openai_api_key">OpenAI API key</label>
+                <input class="st-input" type="password" id="openai_api_key"
+                       autocomplete="off" placeholder="unchanged">
+                <p class="st-hint" id="api-key-state"></p>
+                <button class="st-btn st-btn-danger st-btn-small" type="button" id="clear-api-key">
+                    Clear stored key
+                </button>
+            </div>
+            <div class="st-field">
+                <label class="st-label" for="openai_base_url">API base URL</label>
+                <input class="st-input" type="text" id="openai_base_url"
+                       placeholder="https://api.openai.com/v1" spellcheck="false">
+                <p class="st-hint">Set this to use a compatible endpoint such as Ollama or LocalAI.</p>
+            </div>
+            <div class="st-field">
+                <label class="st-label" for="openai_model">Summary model</label>
+                <input class="st-input" type="text" id="openai_model" placeholder="gpt-3.5-turbo">
+            </div>
+            <div class="st-field">
+                <label class="st-label" for="summary_prompt">Summary prompt</label>
+                <textarea class="st-input" id="summary_prompt" rows="3"
+                          placeholder="Summarize the following text:"></textarea>
+            </div>
+            <div class="st-field">
+                <label class="st-label" for="analyst_prompt">Analyst prompt</label>
+                <textarea class="st-input" id="analyst_prompt" rows="3"
+                          placeholder="Leave empty to disable the analyst"></textarea>
+            </div>
+            <div class="st-field">
+                <label class="st-label" for="analyst_model">Analyst model</label>
+                <input class="st-input" type="text" id="analyst_model" placeholder="gpt-4o">
+            </div>
+        </section>
+
+        <!-- Notifications -->
+        <section class="st-section">
+            <h2>Notifications</h2>
+            <p class="st-hint">
+                The webhook fires only when the analyst's entire reply equals the trigger text.
+            </p>
+            <div class="st-field">
+                <label class="st-label" for="notification_trigger">Trigger text</label>
+                <input class="st-input" type="text" id="notification_trigger">
+            </div>
+            <div class="st-field">
+                <label class="st-label" for="notification_webhook_url">Webhook URL</label>
+                <input class="st-input" type="text" id="notification_webhook_url"
+                       spellcheck="false" placeholder="https://ntfy.sh/your-topic">
+            </div>
+        </section>
+
+        <!-- Advanced -->
+        <details class="st-section">
+            <summary><h2>Advanced</h2></summary>
+
+            <div class="st-field">
+                <label class="st-label" for="opml_file_path">OPML file path</label>
+                <input class="st-input" type="text" id="opml_file_path"
+                       spellcheck="false" placeholder="/app/config/subscriptions.opml">
+                <p class="st-hint">Must be inside <code>/app/config</code> (your mounted config directory).</p>
+            </div>
+
+            <div class="st-field">
+                <label class="st-label">Fixed paths</label>
+                <input class="st-input" type="text" value="markdown_dir_path: /app/output/" disabled>
+                <input class="st-input" type="text" value="database_file_path: /app/config/matcha.db" disabled>
+                <p class="st-hint">
+                    These are pinned to the container's mounted volumes so digests and read
+                    history survive rebuilds.
+                </p>
+            </div>
+
+            <div class="st-field">
+                <label class="st-label">Generated config.yaml</label>
+                <div class="st-actions">
+                    <button class="st-btn st-btn-small" type="button" id="refresh-config">Refresh</button>
+                    <label class="st-checkbox st-checkbox-inline">
+                        <input type="checkbox" id="reveal-secrets"><span>Reveal API key</span>
+                    </label>
+                </div>
+                <pre class="st-pre" id="config-preview">Click Refresh to load.</pre>
+            </div>
+        </details>
+
+        <!-- Account -->
+        <section class="st-section">
+            <h2>Account</h2>
+            <div class="st-field">
+                <label class="st-label" for="current_password">Current password</label>
+                <input class="st-input" type="password" id="current_password" autocomplete="current-password">
+            </div>
+            <div class="st-field">
+                <label class="st-label" for="new_password">New password</label>
+                <input class="st-input" type="password" id="new_password" autocomplete="new-password">
+                <p class="st-hint">At least 10 characters.</p>
+            </div>
+            <div class="st-field">
+                <label class="st-label" for="confirm_password">Confirm new password</label>
+                <input class="st-input" type="password" id="confirm_password" autocomplete="new-password">
+            </div>
+            <div class="st-actions">
+                <button class="st-btn st-btn-primary" type="button" id="change-password">Change password</button>
+            </div>
+        </section>
+
+        <div class="st-savebar">
+            <span class="st-dirty" id="dirty-state"></span>
+            <button class="st-btn st-btn-primary" type="button" id="save-all">Save all</button>
+        </div>
+    </main>
+
+    <!-- Feed preview popover -->
+    <div class="st-panel-backdrop" id="preview-backdrop" hidden>
+        <div class="st-panel" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+            <div class="st-panel-head">
+                <h3 id="preview-title">Feed preview</h3>
+                <button class="st-btn-icon" type="button" id="preview-close" aria-label="Close">✕</button>
+            </div>
+            <div class="st-panel-body" id="preview-body"></div>
+        </div>
+    </div>
+
+    <div class="st-toast-host" id="toast-host" aria-live="polite"></div>
+{{end}}
+
+{{define "scripts"}}
+    <script src="/static/settings.js"></script>
+{{end}}
