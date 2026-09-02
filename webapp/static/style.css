@@ -104,6 +104,29 @@ body {
     color: var(--bg);
 }
 
+/* Sidebar footer: lives here rather than in settings.css because the digest
+   page links to Settings and only loads this stylesheet. */
+.sidebar-footer {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+}
+
+.sidebar-footer a {
+    display: block;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 8px 10px;
+    border-radius: 3px;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.sidebar-footer a:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+
 /* Main content */
 .content {
     margin-left: 220px;

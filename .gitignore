@@ -1,2 +1,6 @@
 output/
 config/
+
+# Local build artifacts
+webapp/matcha-webapp
+webapp/webapp

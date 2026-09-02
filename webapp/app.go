@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -13,59 +12,33 @@ import (
 	"github.com/gomarkdown/markdown"
 )
 
-const outputDir = "/app/output"
-
-var indexTemplate = template.Must(template.New("index").Parse(`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1d2021">
-    <meta name="description" content="Daily news digest from RSS feeds">
-    <title>Matcha Digest</title>
-    <link rel="icon" href="/static/icons/icon-192.svg">
-    <link rel="apple-touch-icon" href="/static/icons/icon-192.svg">
-    <link rel="manifest" href="/static/manifest.json">
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-    <input type="checkbox" id="menu-toggle" class="menu-toggle">
-    <label for="menu-toggle" class="menu-btn">☰</label>
-    <nav class="sidebar">
-        <h2>Files</h2>
-        <ul class="file-list">
-            {{range .Files}}
-            <li><a href="/file/{{.Name}}" {{if .Active}}class="active"{{end}}>{{.Date}}</a></li>
-            {{end}}
-        </ul>
-    </nav>
-    <main class="content">
-        {{.Content}}
-    </main>
-    <script>
-        document.querySelectorAll('.content a').forEach(function(link) {
-            link.setAttribute('target', '_blank');
-            link.setAttribute('rel', 'noopener');
-        });
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/static/sw.js').catch(function(err) {
-                console.log('SW registration failed:', err);
-            });
-        }
-    </script>
-</body>
-</html>
-`))
+var outputDir = envOr("MATCHA_OUTPUT_DIR", "/app/output")
 
 type FileInfo struct {
-	Name    string
-	Date    string
-	Active  bool
+	Name   string
+	Date   string
+	Active bool
 }
 
 type PageData struct {
 	Files   []FileInfo
 	Content template.HTML
+}
+
+// safeMarkdownName rejects anything that is not a plain digest filename.
+//
+// The name comes straight from the URL and is joined onto outputDir. Now that
+// the config directory holds auth.json and an API key, a traversal here would
+// be credential disclosure rather than a curiosity, so this is checked at both
+// the handler and the read.
+func safeMarkdownName(name string) bool {
+	if name == "" || name != path.Base(name) {
+		return false
+	}
+	if strings.ContainsAny(name, `/\`) || strings.HasPrefix(name, ".") {
+		return false
+	}
+	return strings.HasSuffix(name, ".md")
 }
 
 func listMarkdownFiles() ([]FileInfo, error) {
@@ -106,6 +79,9 @@ func getLatestFile() (string, error) {
 }
 
 func renderMarkdown(filename string) (template.HTML, error) {
+	if !safeMarkdownName(filename) {
+		return "", os.ErrNotExist
+	}
 	path := filepath.Join(outputDir, filename)
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -118,17 +94,20 @@ func renderMarkdown(filename string) (template.HTML, error) {
 func renderPage(w http.ResponseWriter, filename string) {
 	files, err := listMarkdownFiles()
 	if err != nil {
-		http.Error(w, "Error reading files", 500)
+		http.Error(w, "Error reading files", http.StatusInternalServerError)
 		return
 	}
 
 	if filename == "" {
 		latest, err := getLatestFile()
 		if err != nil || latest == "" {
-			indexTemplate.Execute(w, PageData{Files: files})
+			render(w, "index.html", PageData{Files: files})
 			return
 		}
 		filename = latest
+	} else if !safeMarkdownName(filename) {
+		http.Error(w, "Not found", http.StatusNotFound)
+		return
 	}
 
 	for i := range files {
@@ -137,47 +116,35 @@ func renderPage(w http.ResponseWriter, filename string) {
 
 	content, err := renderMarkdown(filename)
 	if err != nil {
-		http.Error(w, "Error reading file", 404)
+		http.Error(w, "Error reading file", http.StatusNotFound)
 		return
 	}
 
-	indexTemplate.Execute(w, PageData{Files: files, Content: content})
+	render(w, "index.html", PageData{Files: files, Content: content})
+}
+
+func handleIndex(w http.ResponseWriter, r *http.Request) {
+	renderPage(w, "")
+}
+
+func handleFile(w http.ResponseWriter, r *http.Request) {
+	renderPage(w, r.PathValue("name"))
+}
+
+type fileEntry struct {
+	Name string `json:"name"`
+	Date string `json:"date"`
 }
 
 func filesHandler(w http.ResponseWriter, r *http.Request) {
 	files, err := listMarkdownFiles()
 	if err != nil {
-		http.Error(w, "Error", 500)
+		http.Error(w, "Error", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, "{\"files\":[")
-	for i, f := range files {
-		if i > 0 {
-			fmt.Fprintf(w, ",")
-		}
-		fmt.Fprintf(w, "{\"name\":\"%s\",\"date\":\"%s\"}", f.Name, f.Date)
+	entries := make([]fileEntry, 0, len(files))
+	for _, f := range files {
+		entries = append(entries, fileEntry{Name: f.Name, Date: f.Date})
 	}
-	fmt.Fprintf(w, "]}")
-}
-
-func main() {
-	fs := http.FileServer(http.Dir("/app/webapp/static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/files" {
-			filesHandler(w, r)
-			return
-		}
-		if strings.HasPrefix(r.URL.Path, "/file/") {
-			filename := strings.TrimPrefix(r.URL.Path, "/file/")
-			renderPage(w, filename)
-			return
-		}
-		renderPage(w, "")
-	})
-
-	log.Println("Server starting on :7321")
-	log.Fatal(http.ListenAndServe(":7321", nil))
+	writeJSON(w, http.StatusOK, map[string]any{"files": entries})
 }

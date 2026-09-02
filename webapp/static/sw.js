@@ -1,14 +1,27 @@
-const CACHE_NAME = 'matcha-v1';
+// Bump CACHE_NAME whenever anything in STATIC_ASSETS changes. /static/* is
+// served cache-first, so without a bump users keep running the old assets
+// against a new server indefinitely.
+const CACHE_NAME = 'matcha-v2';
 const MARKDOWN_CACHE = 'matcha-markdown-v1';
 
 const STATIC_ASSETS = [
   '/',
   '/static/style.css',
+  '/static/gruvbox-palette.css',
+  '/static/settings.css',
+  '/static/settings.js',
   '/static/manifest.json',
   '/static/icons/icon-192.svg',
   '/static/icons/icon-512.svg',
   '/static/sw.js'
 ];
+
+// Never cache the authenticated settings area. Without this the navigation
+// branch below would store the settings page in a shared cache and, when
+// offline, fall back to cache.match('/') -- serving the digest under the
+// /settings URL. Returning without respondWith hands the request back to the
+// browser's default networking.
+const NEVER_CACHE = /^\/(settings|login|logout|api)(\/|$)/;
 
 const MARKDOWN_REGEX = /\.(md)$/;
 
@@ -39,6 +52,14 @@ self.addEventListener('activate', (event) => {
 // Fetch: stale-while-revalidate for markdown, cache-first for static
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  // Bail before any caching branch.
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  if (NEVER_CACHE.test(url.pathname)) {
+    return;
+  }
 
   // Handle markdown files
   if (MARKDOWN_REGEX.test(url.pathname) || url.pathname === '/files') {

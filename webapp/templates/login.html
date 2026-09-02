@@ -1,0 +1,46 @@
+{{define "title"}}Sign in · Matcha{{end}}
+
+{{define "head"}}
+    <link rel="stylesheet" href="/static/settings.css">
+{{end}}
+
+{{define "sidebar"}}
+        <h2>Matcha</h2>
+        <ul class="file-list">
+            <li><a href="/">← Back to digest</a></li>
+        </ul>
+{{end}}
+
+{{define "main"}}
+    <main class="st-page st-page-narrow">
+        <div class="st-header">
+            <h1>Sign in</h1>
+            <p class="st-hint">Matcha settings are password protected.</p>
+        </div>
+
+        {{if .Error}}
+        <div class="st-banner st-banner-error">{{.Error}}</div>
+        {{end}}
+
+        <form class="st-section" method="POST" action="/login" autocomplete="on">
+            <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+            <input type="hidden" name="next" value="{{.Next}}">
+
+            <div class="st-field">
+                <label class="st-label" for="password">Password</label>
+                <input class="st-input" type="password" id="password" name="password"
+                       autocomplete="current-password" autofocus required>
+            </div>
+
+            <div class="st-actions">
+                <button class="st-btn st-btn-primary" type="submit">Sign in</button>
+            </div>
+
+            <p class="st-hint">
+                First time here? The generated password is in your container log and in
+                <code>config/initial-password.txt</code>. Lost it? Delete
+                <code>config/auth.json</code> and restart the container to get a new one.
+            </p>
+        </form>
+    </main>
+{{end}}
